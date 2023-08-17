@@ -22,7 +22,7 @@ export const addDevice = async function (req, res, next) {
 export const handOver = async function (req, res, next) {
     try {
         const allotment = {allotment: req.body}
-        const device = await deviceModel.findByIdAndUpdate(req.params.id, {allotment: req.body})
+        const device = await deviceModel.findByIdAndUpdate(req.params.id, {allotment: req.body},   { new: true })
         // console.log(device)
         if (device.allotment) {
             device.status = 1
@@ -73,16 +73,17 @@ export const getDevice = async function (req, res, next) {
             message: error.errors,
         })
     }
-
 }
+
+
 
 export const getDetailDevice = async function (req, res, next) {
     try {
-        const detailService = deviceModel.findById(req.params.id);
+        console.log(req.params.id)
+        const detailDevice = await deviceModel.findById(req.params.id);
         res.status(200).json({
-            code: '00',
             message: 'success',
-            response: detailService
+            response: detailDevice
         })
     } catch (e) {
         res.status(400).json({

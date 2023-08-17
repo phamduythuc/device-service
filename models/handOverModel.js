@@ -10,13 +10,13 @@ export const handOverSchema = Schema({
         required: true,
         type: String
     },
-    date: {
-        type: Date,
-        required: true
-    },
     status: {
         type: String,
         required: true
+    },
+    position : {
+      required: true,
+      type: String
     },
     onsite: {
         required: true,
@@ -34,6 +34,10 @@ export const handOverSchema = Schema({
     note: {
         required: false,
         type: String
+    },
+    dateOfDelivery: {
+        required: true,
+        type: Date
     }
 })
 const HandOverModel = model('handOver', handOverSchema);
