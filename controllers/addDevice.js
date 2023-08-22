@@ -1,10 +1,46 @@
 import deviceModel from '../models/deviceModel.js'
 import HandOverModel from "../models/handOverModel.js";
+import * as path from "path";
+import multer from "multer"
 
+const generateUniqueFileName = (file) => {
+    const timestamp = Date.now();
+    const randomString = Math.random().toString(36).substring(2, 8);
+    const extension = path.extname(file.originalname);
+    const ext = file.mimetype.split('/')[1]
+    return `photo-${randomString}-${timestamp}${extension}`;
+};
+const multerStorage = multer.diskStorage({
+    destination: (req, file, cb) => {
+        cb(null, 'public/img');
+    },
+    filename: (req, file, cb) => {
+        cb(null, generateUniqueFileName(file));
+    }
+});
+const multerFilter = (req, file, cb) => {
+    if (file.mimetype.startsWith('image')) {
+        cb(null, true);
+    } else {
+        cb(new Error('Not an image! Please upload only images.'), false);
+    }
+};
+const upload = multer({storage: multerStorage, fileFilter: multerFilter})
+export const uploadImg = upload.array('photo', 4);
 export const addDevice = async function (req, res, next) {
     try {
-        const device = await deviceModel.create(req.body)
-        console.log(device)
+
+        const jsonData = JSON.parse(req.body?.data);
+
+        const newDevice = {
+            name: jsonData.name,
+            type: jsonData.type,
+            serial: jsonData.serial,
+            deviceAddDate: jsonData.deviceAddDate,
+            photo: req.files ? req.files.map(file => file.filename) : null,
+            thumbnail: req.files ? req.files[0].filename : 'default.jpg'
+        };
+        const device = await deviceModel.create(newDevice);
         res.status(201).json({
             message: 'success',
             response: device
@@ -21,8 +57,7 @@ export const addDevice = async function (req, res, next) {
 }
 export const handOver = async function (req, res, next) {
     try {
-        const allotment = {allotment: req.body}
-        const device = await deviceModel.findByIdAndUpdate(req.params.id, {allotment: req.body},   { new: true })
+        const device = await deviceModel.findByIdAndUpdate(req.params.id, {allotment: req.body}, {new: true})
         // console.log(device)
         if (device.allotment) {
             device.status = 1
@@ -56,8 +91,16 @@ export const updateDevice = async function (req, res, next) {
 }
 export const getDevice = async function (req, res, next) {
     try {
-        const device = await deviceModel.find().lean().exec();
-        console.log(device)
+        const page = parseInt(req.query.page) || 0;
+        const size = parseInt(req.query.limit) || 10;
+        const pageIndex = page * size;
+        const pageSize = (page + 1) * size;
+        const device = await deviceModel.find().select('_id name serial type status allotment deviceAddDate thumbnail photo').sort({
+            createdAt: -1,
+            updatedAt: -1
+        }).skip(pageIndex).limit(pageSize).lean().exec();
+
+        console.log(page, size)
         const sanitizedData = device.map(item => {
             const {_id, ...rest} = item;
 
@@ -66,7 +109,8 @@ export const getDevice = async function (req, res, next) {
 
         res.status(200).json({
             message: 'success',
-            response: sanitizedData
+            response: sanitizedData,
+            total: await deviceModel.countDocuments()
         })
     } catch (error) {
         res.status(400).json({
@@ -76,11 +120,10 @@ export const getDevice = async function (req, res, next) {
 }
 
 
-
 export const getDetailDevice = async function (req, res, next) {
     try {
         console.log(req.params.id)
-        const detailDevice = await deviceModel.findById(req.params.id);
+        const detailDevice = await deviceModel.findById(req.params.id).select('_id name serial type status allotment deviceAddDate thumbnail photo');
         res.status(200).json({
             message: 'success',
             response: detailDevice
@@ -106,5 +149,17 @@ export const deleteItemDevice = async function (req, res, next) {
         res.status(400).json({
             message: 'fail',
         })
+    }
+}
+
+export const uploadImage = async function (req, res, next) {
+    try {
+        console.log(req.body)
+        console.log(req.file)
+        res.status(200).json({
+            message: 'success',
+        })
+    } catch (e) {
+
     }
 }

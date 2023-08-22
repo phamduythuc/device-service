@@ -22,7 +22,25 @@ export const deviceSchema = Schema({
     allotment: {
         type: Object,
         default: {}
-    }
+    },
+    data: {
+        type: String,
+
+    },
+    photo: {
+        type: Array,
+        default:[ 'default.jpg']
+    },
+    thumbnail: {
+        type: String,
+        default: 'default.jpg'
+    },
+    deviceAddDate: {
+        type: Date,
+        required: true
+    },
+    createdAt: { type: Date, default: Date.now },
+    updatedAt: { type: Date, default: Date.now },
 })
 const deviceModel = model('device', deviceSchema);
 export default deviceModel;
