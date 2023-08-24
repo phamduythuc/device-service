@@ -10,7 +10,7 @@ app.use(cors({ origin: 'http://localhost:4200' }));
 if(process.env.NODE_ENV === 'development') {
     app.use(morgan('dev'))
 }
-app.use(express.static('frontend'));
+app.use(express.static('dist'));
 app.use(express.json());
 app.use('/api/v1', router);
 
