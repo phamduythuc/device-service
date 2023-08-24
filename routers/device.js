@@ -12,7 +12,7 @@ import {
 const router = express.Router();
 router.post('/hand-over/:id', handOver);
 router.post('/new-device', uploadImg, addDevice );
-router.patch('/update-device/:id', updateDevice)
+router.patch('/update-device/:id', uploadImg, updateDevice)
 router.get('/devices', getDevice);
 router.get('/device/:id', getDetailDevice);
 router.delete('/delete/:id', deleteItemDevice);
