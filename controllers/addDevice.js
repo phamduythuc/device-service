@@ -27,10 +27,13 @@ const multerFilter = (req, file, cb) => {
 };
 const upload = multer({storage: multerStorage, fileFilter: multerFilter})
 export const uploadImg = upload.array('photo', 4);
+const convertJson = (json) => {
+    return JSON.parse(json)
+}
 export const addDevice = async function (req, res, next) {
     try {
 
-        const jsonData = JSON.parse(req.body?.data);
+        const jsonData = convertJson(req.body?.data);
 
         const newDevice = {
             name: jsonData.name,
@@ -57,8 +60,19 @@ export const addDevice = async function (req, res, next) {
 }
 export const handOver = async function (req, res, next) {
     try {
+        // const jsonData = convertJson(req.body?.transfer);
+        // const newTransfer = {
+        //     dateOfDelivery: jsonData.dateOfDelivery,
+        //     email: jsonData.email,
+        //     handover_person: jsonData.handover_person,
+        //     hotline: jsonData.hotline,
+        //     onsite: jsonData.onsite,
+        //     position: jsonData.position,
+        //     receiver: jsonData.receiver,
+        //     status: jsonData.status,
+        //     note: jsonData.note
+        // }
         const device = await deviceModel.findByIdAndUpdate(req.params.id, {allotment: req.body}, {new: true})
-        // console.log(device)
         if (device.allotment) {
             device.status = 1
         }
@@ -77,7 +91,16 @@ export const handOver = async function (req, res, next) {
 }
 export const updateDevice = async function (req, res, next) {
     try {
-        const device = await deviceModel.findByIdAndUpdate(req.params.id, req.body)
+        const jsonData = convertJson(req.body?.data);
+        const update = {
+            name: jsonData.name,
+            type: jsonData.type,
+            serial: jsonData.serial,
+            deviceAddDate: jsonData.deviceAddDate,
+            photo: req.files ? req.files.map(file => file.filename) : null,
+            thumbnail: req.files ? req.files[0].filename : 'default.jpg'
+        };
+        const device = await deviceModel.findByIdAndUpdate(req.params.id, update).select('_id name')
         res.status(200).json({
             message: 'success',
             response: device
