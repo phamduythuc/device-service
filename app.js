@@ -30,8 +30,7 @@ app.use((req, res, next) => {
 });
 app.use('/api/v1', router);
 app.use('/api/v1', (req, res, next) => {
-    // Xử lý các yêu cầu không khớp với các đường dẫn API
-    // Gọi trang public index.html
+
     res.sendFile(path.join(__dirname, '/public/index.html'));
 });
 
