@@ -8,7 +8,7 @@ import cors from 'cors'
 const __filename = fileURLToPath(import.meta.url);
 const __dirname = path.dirname(__filename);
  const  app = express();
-app.use(cors({ origin: 'http://localhost:4200' }));
+app.use(cors());
 if(process.env.NODE_ENV === 'development') {
     app.use(morgan('dev'))
 }
