@@ -5,9 +5,9 @@ import dotenv from 'dotenv'
 // const dotenv = require('dotenv')
 dotenv.config({path: './environments/config.env'});
 
-const DB = process.env.DATABASE.replace('<PASSWORD>', process.env.DATABASE_PASSWORD);
-console.log(DB)
-mongoose.connect(DB, {
+// const DB = process.env.DATABASE.replace('<PASSWORD>', process.env.DATABASE_PASSWORD);
+
+mongoose.connect(process.env.DATABASE, {
     useNewUrlParser: true,
     useUnifiedTopology: true,
 
