@@ -41,7 +41,7 @@ export const addDevice = async function (req, res, next) {
             serial: jsonData.serial,
             deviceAddDate: jsonData.deviceAddDate,
             photo: req.files ? req.files.map(file => file.filename) : null,
-            thumbnail: req.files ? req.files[0].filename : 'default.jpg'
+            thumbnail: req.files ? req.files[0]?.filename : 'default.jpg'
         };
         const device = await deviceModel.create(newDevice);
         res.status(201).json({
